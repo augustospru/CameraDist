@@ -7,6 +7,8 @@ s = serial.Serial("COM3", 115200)
 FRAME_HEAD = b"\x00\xFF"
 FRAME_TAIL = b"\xCC"
 
+##
+
 s.write(b"AT+DISP=3\r") #seta para leitura de usb, disp=1 seta pra UART 
 
 #_ = s.read_until(FRAME_HEAD)
