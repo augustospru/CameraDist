@@ -7,21 +7,21 @@ s = serial.Serial("COM3", 115200)
 FRAME_HEAD = b"\x00\xFF"
 FRAME_TAIL = b"\xCC"
 
-##
-
 s.write(b"AT+DISP=3\r") #seta para leitura de usb, disp=1 seta pra UART 
+# s.write(b"AT+FPS=15\r") #seta FPS para 10 
 
-#_ = s.read_until(FRAME_HEAD)
-while s.is_open:
-    res = s.read(10019)
-    # print("length", res.__len__())
-    # if res.__len__() < 1000: 
-    #     continue
-    # print(res)
-    # byteArray = bytearray(10000 - res.__len__())
+s.flush() #flush buffer
+while True:
+    head = s.read_until(FRAME_HEAD)
+    if head.__len__() != 19:
+        continue
+    print(head.hex(' '))
+
+    img = s.read(10002)
+
     byteArray = bytearray()
-    byteArray.extend(res)
-    byteArray = byteArray[:10000]
+    byteArray.extend(img)
+    byteArray = byteArray[:10000] #remove frame_head
     
     flatNumpyArray = np.array(byteArray) #convert byte array to numpyarray
     # Convert the array to make a 100x100 grayscale image.
@@ -30,5 +30,6 @@ while s.is_open:
     cv2.imshow('frame', grayImageResized)
     if cv2.waitKey(1) == ord('q'):
         break
+    s.flush() #flush buffer
 
 cv2.destroyAllWindows()
