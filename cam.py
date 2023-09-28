@@ -5,7 +5,7 @@ import numpy as np
 s = serial.Serial("COM3", 115200)
 
 FRAME_HEAD = b"\x00\xFF"
-FRAME_TAIL = b"\xCC"
+FRAME_TAIL = b"\xDD"
 
 s.write(b"AT+DISP=3\r") #seta para leitura de usb, disp=1 seta pra UART 
 # s.write(b"AT+FPS=15\r") #seta FPS para 10 
@@ -13,6 +13,7 @@ s.write(b"AT+DISP=3\r") #seta para leitura de usb, disp=1 seta pra UART
 s.flush() #flush buffer
 while True:
     head = s.read_until(FRAME_HEAD)
+
     if head.__len__() != 19:
         continue
     print(head.hex(' '))
@@ -30,6 +31,5 @@ while True:
     cv2.imshow('frame', grayImageResized)
     if cv2.waitKey(1) == ord('q'):
         break
-    s.flush() #flush buffer
 
 cv2.destroyAllWindows()
