@@ -14,21 +14,25 @@ s.write(b"AT+DISP=3\r") #seta para leitura de usb e display no lcd, disp=1 seta 
 time.sleep(0.1)
 s.flush() #flush buffer
 
+def dist(value: int):
+    return ((value/5.1)**2)/10 #distance in cm, If UNIT is 0，the distance between this pixel and top is (p/5.1)^2
+
 while s.is_open:
     if not s.readable():
         continue
 
-    packet = s.read(10022)
-    idxHead = packet.find(FRAME_HEAD)
+    packet = s.read(10022) #get whole packet
+    idxHead = packet.find(FRAME_HEAD) #locate frame head
     if idxHead < 0:
             continue
-    packet = packet [idxHead:]
-    packet += s.read(10022 - len(packet))
+    packet = packet [idxHead:] #get packet from frame head
+    packet += s.read(10022 - len(packet)) #get the rest of the frame
 
-    img = packet[20:10020]
+    img = packet[20:10020] #get the image
     # print(packet[0:2].hex(' '), packet[10020:10022].hex(' '))
-    dist = ((img[4949]/5.1)**2)/10 #distance in cm, If UNIT is 0，the distance between this pixel and top is (p/5.1)^2
-    print(img[4949], dist)
+    # distpixel = dist(img[4949])
+    distimg = ([dist(img[i]) for i in range(10000)]) #get the distance for each pixel
+    # print(img[4949], distpixel, distimg[4949])
 
     byteArray = bytearray()
     byteArray.extend(img)
